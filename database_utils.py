@@ -76,7 +76,7 @@ class DatabaseConnector:
         engine_2 = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         df.to_sql(table_names, engine_2, index = True, if_exists = 'replace')
         
-v = DatabaseConnector()
+# v = DatabaseConnector('/Users/olawaleolalekan/Documents/AiCore/mrdc/db_creds.yaml')
 
     
     

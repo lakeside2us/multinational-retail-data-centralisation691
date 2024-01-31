@@ -4,160 +4,180 @@ import numpy as np
 
 class DataCleaning:
     """
-
     This class is used to clean the data extracted from the different data sources
-
-    Attributes:
-        
     """
-    
-    # class constructor
-    
-    def __init__(self, df = None):
-        
-        # attributes
-        self.df = df
-        
-    # methods
-    def clean_user_data(self):
+
+    # methods   
+    def clean_user_data(self, legacy_users_data):
         """
         This function is used to clean the user data.
         """
-        if self.df is None:
-            raise ValueError('DataFrame not provided to DataCleaning instance')
-
-        # Replacing the NULL values with NaN
-        self.df = self.df.replace('NULL', np.nan)
+        # Replacing 'NULL' values with NaN
+        legacy_users_data.replace('NULL', np.nan, inplace = True)
+        legacy_users_data.dropna(inplace = True)
+        
+        # Dropping the rows with missing values in key columns
+        legacy_users_data.dropna(subset = ['date_of_birth', 'email_address', 
+                                           'user_uuid'], how = 'any', axis = 0, inplace = True)
 
         # Converting the date columns to datetime format
-        date_columns = ['date_of_birth', 'join_date']
-        self.df[date_columns] = self.df[date_columns].apply(pd.to_datetime, errors='coerce')
-
-        # Dropping the rows with missing/incorrect values in key columns
-        key_columns = ['first_name', 'last_name', 'user_uuid']
-        self.df = self.df.dropna(subset = key_columns)
-
-        # Removing the rows where date_of_birth is in the future
-        self.df = self.df[self.df['date_of_birth'] <= pd.Timestamp.now()]
+        legacy_users_data['date_of_birth'] = pd.to_datetime(legacy_users_data['date_of_birth'], errors = 'ignore')
+        legacy_users_data['join_date'] = pd.to_datetime(legacy_users_data['join_date'],errors = 'coerce')
+        legacy_users_data = legacy_users_data.dropna(subset = 'join_date')
         
-        return self.df
+        # Dropping the rows with missing values in the 'join_date' column
+        legacy_users_data = legacy_users_data.dropna(subset = ['join_date'])
+        
+        # Cleaning the 'phone_number' column
+        legacy_users_data.loc['phone_number'] = legacy_users_data['phone_number'].str.replace('/W', '')
+        
+        # Removing the duplicate entries based on 'email_address'
+        legacy_users_data = legacy_users_data.drop_duplicates(subset = ['email_address'])
+        need_to_replace = ['.', ' ']
+        for i in need_to_replace:
+            legacy_users_data['phone_number'] = legacy_users_data['phone_number'].str.replace(i,'')
+
+        # Cleaning up the wrongly typed values
+        legacy_users_data = legacy_users_data.drop_duplicates(subset=['email_address'])
+        need_to_replace = ['.', ' ']
+        for i in need_to_replace:
+            legacy_users_data['phone_number'] = legacy_users_data['phone_number'].str.replace(i,'')
+
+        # Dropping the first column (index column)
+        legacy_users_data.drop(legacy_users_data.columns[0], axis = 1, inplace = True)
+
+        return legacy_users_data
     
-    def clean_card_data(self):
+    
+    def clean_card_data(self, card_data_table):
         """
         This function is used to clean the card data extracted from AWS S3 PDF file.
         """
-        if self.dataframe is None:
-            raise ValueError('DataFrame not provided to DataCleaning instance')
+        # Replacing the 'NULL' values with NaN
+        card_data_table.replace('NULL',np.nan, inplace = True)
+        
+        # Dropping the rows with missing values in the 'card_number' column
+        card_data_table.dropna(subset = ['card_number'], how = 'any', axis = 0, inplace = True)
 
-        # Removing the rows with 'NULL' in card_number
-        clean_data = self.df[self.df['card_number'] != 'NULL'].copy()
-
-        # Converting the expiry_date to datetime format with specified format
-        clean_data.loc[:, 'expiry_date'] = pd.to_datetime(clean_data['expiry_date'], format = '%m/%y', errors = 'coerce')
-
-        # Validating date_payment_confirmed using the validate function
-        clean_data.loc[:, 'date_payment_confirmed'] = pd.to_datetime(clean_data['date_payment_confirmed'], errors = 'coerce')
-
-        # Dropping the rows with invalid date_payment_confirmed
-        clean_data = clean_data.dropna(subset = ['date_payment_confirmed'])
-
-        return clean_data
+        # Removing the rows where 'card_number' contains letters or '?'
+        card_data_table['card_number'] = card_data_table['card_number'].apply(str)
+        card_data_table = card_data_table[~card_data_table['card_number'].str.contains('[a-zA-Z?]', na = False)]
+        
+        return card_data_table
     
-    def clean_store_data(self, store_data):
+    
+    def clean_store_data(self, store_data_table):
         """
-        This function is used to clean the data from API.
+        This function is used to clean the store data table
         """
         # Resetting the index to prevent duplicating indices after data manipulation
-        store_data = store_data.reset_index(drop = True)
-
+        store_data_table = store_data_table.reset_index(drop = True)
+        
         # Replacing 'NULL' values with NaN
-        store_data.replace('NULL', np.NaN, inplace = True)
-
+        store_data_table.replace('NULL', np.nan, inplace = True)
+        store_data_table.drop(store_data_table.columns[0], axis=1,inplace=True)
+        store_data_table.drop(columns='lat',inplace=True)
+        
         # Converting 'opening_date' column to datetime format
-        store_data['opening_date'] = pd.to_datetime(store_data['opening_date'], errors ='coerce')
-
-        store_data.loc[[31, 179, 248, 341, 375], 'staff_numbers'] = [78, 30, 80, 97, 39] 
-
+        store_data_table['opening_date'] = pd.to_datetime(store_data_table['opening_date'], errors = 'coerce')
+        
+        store_data_table.loc[[31, 179, 248, 341, 375], 'staff_numbers'] = [78, 30, 80, 97, 39] 
+        
         # Converting the 'staff_numbers' to numeric, drop rows with missing values
-        store_data['staff_numbers'] = pd.to_numeric(store_data['staff_numbers'], errors = 'coerce')
-        store_data.dropna(subset = ['staff_numbers'], axis = 0, inplace = True)
-
+        store_data_table['staff_numbers'] = pd.to_numeric(store_data_table['staff_numbers'], errors = 'coerce')
+        store_data_table.dropna(subset=['staff_numbers'], axis = 0, inplace = True)
+        
         # Cleaning the 'continent' column
-        store_data['continent'] = store_data['continent'].str.replace('eeEurope', 'Europe').str.replace('eeAmerica', 'America')
+        store_data_table['continent'] = store_data_table['continent'].str.replace('eeEurope','Europe')
+        store_data_table['continent'] = store_data_table['continent'].str.replace('eeAmerica','America')
 
-        return store_data
+        return store_data_table
     
-    def convert_product_weights(self, products_df):
+    
+    def convert_product_weights(self,weight):
         """
-        This function is used to clean up the weight.
+        This function is used to clean up the weight: converts the weights into kg
         """
-       # Converting the product weights
-        def convert_weight(weight):
-            try:
-                unit_factors = {'g': 1, 'ml': 0.001, 'k': 1000}
-                return float(weight) if isinstance(weight, (int, float)) else float(weight[:-1]) * unit_factors.get(weight[-1], 1)
-            except (ValueError, TypeError):
-                return None
-
-        products_df['weight'] = products_df['weight'].apply(convert_weight)
-        return products_df
-
-    def clean_products_data(self, products_data):
+        if 'kg' in weight:
+            weight = weight.replace('kg', '')
+            weight = float(weight)
+        elif 'g' in weight:
+            weight = weight.replace('g', '')
+            weight = float(weight) / 1000
+        elif 'ml' in weight:
+            weight = weight.replace('ml', '')
+            weight = float(weight) / 1000
+        elif 'oz' in weight:
+            weight = weight.replace('oz', '')
+            weight = float(weight) * 0.0283495
+        
+        return weight
+    
+    
+    def clean_products_data(self, s3_data_table):
         """
         This function is used to clean up erroneous values in the Products DataFrame.
         """
         # Replacing 'NULL' values with NaN
-        products_data.replace('NULL', np.NaN, inplace = True)
+        s3_data_table.drop(s3_data_table.columns[0], axis = 1, inplace = True)
 
+        s3_data_table.replace('NULL', np.nan, inplace = True)
+        s3_data_table.dropna(inplace = True)
+        
         # Converting 'date_added' column to datetime format
-        products_data['date_added'] = pd.to_datetime(products_data['date_added'], errors = 'coerce')
-
+        s3_data_table['date_added'] = pd.to_datetime(s3_data_table['date_added'], errors = 'coerce')
+        
         # Dropping rows with missing values in 'date_added'
-        products_data.dropna(subset = ['date_added'], how = 'any', axis = 0, inplace = True)
-
+        s3_data_table.dropna(subset = ['date_added'], how = 'any', axis = 0, inplace = True)
+        
         # Converting the 'weight' column to string
-        products_data['weight'] = products_data['weight'].astype(str)
-
+        s3_data_table['weight'] = s3_data_table['weight'].astype(str)
+        
         # Removing the the spaces after the dots in the 'weight' column
-        products_data['weight'] = products_data['weight'].apply(lambda x: x.replace(' .', ''))
+        s3_data_table['weight'] = s3_data_table['weight'].apply(lambda x: x.replace(' .',''))
 
-        # Extracting the numeric values from 'weight' column where it contains 'x'
-        temp_cols = products_data.loc[products_data.weight.str.contains('x'), 'weight'].str.split('x', expand = True)
-        numeric_cols = temp_cols.apply(lambda x: pd.to_numeric(x.str.extract('(\d+\.?\d*)', expand = False)), axis = 1)
-        final_weight = numeric_cols.prod(axis = 1)
-        products_data.loc[products_data.weight.str.contains('x'), 'weight'] = final_weight
+        # Extracting the numeric values from 'weight' column where it contains 'x' 
+        temp_columns = s3_data_table.loc[s3_data_table.weight.str.contains('x'), 
+                                         'weight'].str.split('x', expand = True)
+        
+        # Splitting the suffix from the weight
+        weights = temp_columns[1].str.split('(\d+\.?\d*)',expand=True)
+        
+        nums = temp_columns.apply(lambda x: pd.to_numeric(x.str.extract('(\d+\.?\d*)', expand=False)))
+        
+        new_weight = nums.prod(axis=1)
+        
+        # Total weight + Suffix
+        final_weight = new_weight.astype(str) + weights[2]
+        
+        # Replacing the weight with the final weight
+        s3_data_table.loc[s3_data_table.weight.str.contains('x'), 'weight'] = final_weight
 
-        # Lowercase and strip whitespace in 'weight' column
-        products_data['weight'] = products_data['weight'].apply(lambda x: str(x).lower().strip())
+        # Converting the weight into kg
+        s3_data_table['weight'] = s3_data_table['weight'].apply(lambda x: self.convert_product_weights(x))
 
-        # Dropping the first column (index column)
-        products_data.drop(products_data.columns[0], axis = 1, inplace = True)
-
-        return products_data
+        return s3_data_table
     
-    def clean_orders_data(self, orders_data):
+    def clean_orders_data(self,orders_table):
         """
         This function is used to clean up the orders table data.
         """
-        # Dropping columns that are not needed.
-        orders_data.drop("level_0", axis=1, inplace=True) 
-        orders_data.drop("1", axis=1, inplace=True) 
-        orders_data.drop(orders_data.columns[0], axis=1, inplace=True)
-        orders_data.drop('first_name', axis=1, inplace=True)
-        orders_data.drop('last_name', axis=1, inplace=True)
-        
-        return orders_data
+        orders_table.drop(columns = 'first_name', axis = 1, inplace = True)
+        orders_table.drop(columns = 'last_name', axis = 1, inplace = True)
+        orders_table.drop(columns = '1', axis = 1, inplace = True)
+        orders_table.drop(columns = 'level_0', axis = 1, inplace = True)
+        orders_table.drop(orders_table.columns[0], axis = 1, inplace = True)
+
+        return orders_table
     
-    def clean_date_times_data(self, data):
+    def clean_date_table(self,date_table):
         """
         This function is used to clean up the date times data.
         """
-        # Converting dictionary to a DataFrame
-        data = pd.DataFrame.from_dict(data)
+        date_table['year'] = pd.to_datetime(date_table['year'], errors = 'coerce').dt.year.convert_dtypes()
+        date_table['month'] = pd.to_datetime(date_table['month'], errors = 'coerce', format ='%m').dt.month.convert_dtypes()
+        date_table['day'] = pd.to_datetime(date_table['day'], errors = 'coerce', format = '%d').dt.day.convert_dtypes()
+        date_table['timestamp'] = pd.to_datetime(date_table['timestamp'], errors = 'coerce', format = '%H:%M:%S').dt.time
+        date_table.dropna(inplace = True)
 
-        # Converting the 'year' column to numeric, and drop rows with missing values
-        data['year'] = pd.to_numeric(data['year'], errors = 'coerce')
-        data.dropna(subset = ['year'], how = 'any', axis = 0, inplace = True)
-
-        return data
-   
+        return date_table

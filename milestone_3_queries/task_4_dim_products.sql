@@ -33,5 +33,5 @@ SET weight_class =
 
 
 
-SELECT * from dim_products
+-- SELECT * from dim_products
 	

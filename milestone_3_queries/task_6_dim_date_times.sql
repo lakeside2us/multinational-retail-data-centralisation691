@@ -72,5 +72,5 @@ ALTER TABLE
 		ALTER COLUMN date_uuid TYPE UUID USING date_uuid::UUID;
 
 
-SELECT * from dim_date_times
+-- SELECT * from dim_date_times
 	

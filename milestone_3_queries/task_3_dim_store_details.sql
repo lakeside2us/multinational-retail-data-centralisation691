@@ -78,6 +78,6 @@ ALTER TABLE
 
 
 
-SELECT * from dim_store_details
+-- SELECT * from dim_store_details
 
 	

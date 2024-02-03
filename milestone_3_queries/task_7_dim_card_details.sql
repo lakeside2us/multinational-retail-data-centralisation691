@@ -40,5 +40,5 @@ ALTER TABLE
     	ALTER COLUMN date_payment_confirmed TYPE DATE USING CAST(date_payment_confirmed AS DATE);
 
 
-SELECT * from dim_card_details
+-- SELECT * from dim_card_details
 	

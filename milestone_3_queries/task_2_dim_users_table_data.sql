@@ -27,4 +27,4 @@ ALTER TABLE
     	ALTER COLUMN user_uuid TYPE UUID USING user_uuid::uuid,
     	ALTER COLUMN join_date TYPE DATE;
 	
-select * from dim_users
+-- select * from dim_users

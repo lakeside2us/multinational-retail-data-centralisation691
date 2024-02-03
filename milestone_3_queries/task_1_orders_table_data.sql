@@ -54,4 +54,4 @@ ALTER TABLE
 		ALTER COLUMN product_code TYPE VARCHAR(11),
 		ALTER COLUMN product_quantity TYPE SMALLINT;
 
-select * from orders_table;
+-- select * from orders_table;

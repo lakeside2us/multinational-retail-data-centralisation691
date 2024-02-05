@@ -5,7 +5,7 @@
 -- but we have 15258 records in the dim_card_details table, 
 -- therefore, there are some card details that are not in the dim_card_details.
 
--- Select all the card_numbers in orders_table but not in dim_card_details.
+-- Selecting all the card_numbers in orders_table that are not in dim_card_details.
 
 SELECT 
 	orders_table.card_number
@@ -18,7 +18,7 @@ ON
 WHERE 
 	dim_card_details.card_number IS NULL;
 	
--- Insert all the card detials from orders_table into dim_card_detials table.
+-- Inserting all the card detials from orders_table into dim_card_detials table.
 
 INSERT INTO 
 	dim_card_details (card_number)
@@ -111,7 +111,7 @@ WHERE
     );
 	
 	
--- Foreign keys
+-- Creating the foreign keys
 
 ALTER TABLE 
 	orders_table
@@ -144,4 +144,4 @@ ADD FOREIGN KEY
 
 
 
--- SELECT * from orders_table 
+-- SELECT * FROM orders_table 

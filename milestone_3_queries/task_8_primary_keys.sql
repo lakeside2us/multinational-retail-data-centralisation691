@@ -1,11 +1,4 @@
 --Task 8: Create the primary keys in the dimension table.
-
---Delect the null entry in user_uuid column.
-
-DELETE FROM 
-	dim_users
-WHERE 
-	user_uuid IS Null;
 	
 
 ALTER TABLE 
@@ -38,12 +31,12 @@ ADD PRIMARY KEY
 	(product_code);
 
 
-SELECT * from orders_table 
-SELECT * from dim_date_times
-SELECT * from dim_users 
-SELECT * from dim_card_details
-SELECT * from dim_store_details;
-SELECT * from dim_products
+--SELECT * FROM orders_table 
+--SELECT * FROM dim_date_times
+--SELECT * FROM dim_users 
+--SELECT * FROM dim_card_details
+--SELECT * FROM dim_store_details;
+--SELECT * FROM dim_products
 
 
--- select * from dim_users order by user_uuid desc
+-- select * FROM dim_users ORDER BY user_uuid DESC

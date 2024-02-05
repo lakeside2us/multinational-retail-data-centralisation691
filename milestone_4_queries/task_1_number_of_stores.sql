@@ -16,3 +16,6 @@ GROUP BY
 ORDER BY 
 	total_no_stores 
 DESC;
+
+
+-- SELECT * FROM dim_store_details order by country_code DESC

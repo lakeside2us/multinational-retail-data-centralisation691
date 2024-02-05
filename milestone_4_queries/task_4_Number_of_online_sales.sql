@@ -3,7 +3,7 @@
 SELECT 
 	COUNT(product_quantity) 
 AS 
-	number_of_sales,`
+	number_of_sales,
 SUM
 	(product_quantity) 
 AS 

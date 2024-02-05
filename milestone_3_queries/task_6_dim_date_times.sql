@@ -3,63 +3,63 @@
 -- Maximun length of month column
 
 SELECT 
-	length(CAST(month AS TEXT))
+	LENGTH(MAX(CAST(month AS TEXT)))
 FROM 
 	dim_date_times
 GROUP BY 
 	month
 ORDER BY 
-	length(CAST(month AS TEXT))
+	LENGTH(MAX(CAST(month AS TEXT)))
 DESC
 LIMIT
-1;
---2
+	1;
+-- 	(2)
 
 
 -- Maximun length of year column
 
 SELECT 
-	length(CAST(year AS TEXT))
+	LENGTH(MAX(CAST(year AS TEXT)))
 FROM 
 	dim_date_times
 GROUP BY 
 	year
 ORDER BY 
-	length(CAST(year AS TEXT))
+	LENGTH(MAX(CAST(year AS TEXT)))
 DESC
 LIMIT
-1;
---4
+	1;
+-- (4)
 
 -- Maximun length of day column
 
 SELECT 
-	length(CAST(day AS TEXT))
+	LENGTH(MAX(CAST(day AS TEXT)))
 FROM 
 	dim_date_times
 GROUP BY 
 	day
 ORDER BY 
-	length(CAST(day AS TEXT))
+	LENGTH(MAX(CAST(day AS TEXT)))
 DESC
 LIMIT
-1;
---2
+	1;
+-- (2)
 
 -- Maximun length of time_period column
 
 SELECT 
-	length(CAST(time_period AS TEXT))
+	LENGTH(MAX(CAST(time_period AS TEXT)))
 FROM 
 	dim_date_times
 GROUP BY 
 	time_period
 ORDER BY 
-	length(CAST(time_period AS TEXT))
+	LENGTH(MAX(CAST(time_period AS TEXT)))
 DESC
 LIMIT
-1;
---10
+	1;
+-- (10)
 
 -- Alter the data types
 
@@ -72,5 +72,5 @@ ALTER TABLE
 		ALTER COLUMN date_uuid TYPE UUID USING date_uuid::UUID;
 
 
--- SELECT * from dim_date_times
+-- SELECT * FROM dim_date_times
 	

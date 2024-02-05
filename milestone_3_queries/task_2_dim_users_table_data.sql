@@ -3,18 +3,17 @@
 --Finding the maximum lengths.
 
 SELECT 
-	length
-		(max(cast(country_code as Text))) 
-	AS max_len
+	LENGTH(MAX(CAST(country_code AS Text))) 
 FROM 
 	dim_users
 GROUP BY 
 	country_code
 ORDER BY 
-	max_len 
+	LENGTH(MAX(CAST(country_code AS Text)))
 DESC
 LIMIT 
-2; 
+	1;
+-- (3)
 
 --Updating the colums in the table
 
@@ -27,4 +26,4 @@ ALTER TABLE
     	ALTER COLUMN user_uuid TYPE UUID USING user_uuid::uuid,
     	ALTER COLUMN join_date TYPE DATE;
 	
--- select * from dim_users
+-- SELECT * FROM dim_users

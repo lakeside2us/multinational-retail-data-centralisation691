@@ -48,7 +48,7 @@ class DataExtractor:
         stores_data = []
 
         for i in range(number_of_stores):
-            response = requests.get(f"{endpoint}{i}", headers=key)
+            response = requests.get(f"{endpoint}{i}", headers = key)
             info = response.text
             info_json = json.loads(info)
             stores_data.append(info_json)

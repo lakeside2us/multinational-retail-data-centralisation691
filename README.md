@@ -15,9 +15,7 @@ Multinational Retail Data Centralisation
 
 ### Project Description
 
-< style='text-align: justify;'> A multinational company that sells various goods across the globe currently stores its sales data in many different data sources.
-
-As a result of having its sales data spread in many different data sources, it is not easy to access and analyse the sales data.
+A multinational company that sells various goods across the globe currently stores its sales data in many different data sources.
 
 As a result of having its sales data spread in many different data sources, it is not easy to access and analyse the sales data.
 
@@ -25,7 +23,7 @@ The company is trying to become more data-driven and therefore wants to make its
 
 The project aims to produce a system that stores the current company data in a centralised database and access data from this one central database.
 
-After storing the sales data in a centralised database, the database will be quarried to obtain up-to-date metrics for the business</p>
+After storing the sales data in a centralised database, the database will be quarried to obtain up-to-date metrics for the business.
 
 ### Usage Instructions
 
